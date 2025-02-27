@@ -1,5 +1,5 @@
-import { iseSameSenderMargin, isLastMessage, isSameSender, isSameUser } from '@/app/config/ChatLogics/page';
-import React from 'react';
+
+'use client'
 import ScrollableFeed from 'react-scrollable-feed';
 
 const ScrollableChats = ({ message, user, isGroupChat }) => {

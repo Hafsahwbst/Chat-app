@@ -2,12 +2,10 @@
 import { useAppContext } from '@/Context/AppProvider';
 import React, { useEffect, useRef, useState } from 'react';
 import Peer from 'simple-peer';
-import { io } from 'socket.io-client';
 
-const socket = io("http://localhost:5000");
 
-const Video = ({roomId}) => {
-  const { user, loading, selectedChat } = useAppContext();
+const Video = ({ roomId }) => {
+  const { user, loading, selectedChat, socket } = useAppContext();
 
   const myVideo = useRef();
   const userVideo = useRef();
@@ -122,74 +120,113 @@ const Video = ({roomId}) => {
   if (loading || !user) {
     return <div>Loading...</div>;
   }
-  
-  useEffect(() => {
-    console.log("hellooooo")
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        setStream(stream);
-        if (myVideo.current) {
-          myVideo.current.srcObject = stream;
-        }
 
-        socket.emit("join-room", roomId);
-      });
+  useEffect(() => {
+    
+    if (!roomId || !socket) return;  // Ensure roomId and socket are available
+
+    console.log("Joining room:", roomId);
+  
+   
+    // Join room when the component is first loaded or when the roomId changes
+    navigator.mediaDevices
+    .getUserMedia({ video: true, audio: true })
+    .then((stream) => {
+      console.log("Stream obtained:", stream);
+      setStream(stream);
+      
+      if (myVideo.current) {
+        myVideo.current.srcObject = stream;
+        // myVideo.current.play(); // Ensure play() is called
+      }
+      
+      socket.emit("join-room", roomId);
+    })
+    .catch((err) => {
+      console.error("Error accessing media devices:", err);
+    });
+
 
     socket.on("user-connected", (userId) => {
-      console.log("Helooo")
-      callUser(userId, stream);
+      callUser(userId, stream);  
     });
 
     socket.on("offer", handleReceiveCall);
     socket.on("answer", handleAnswer);
     socket.on("ice-candidate", handleICECandidate);
 
-    // return () => {
-    //   socket.off("user-connected");
-    //   socket.off("offer");
-    //   socket.off("answer");
-    //   socket.off("ice-candidate");
-    // };
-  }, [socket, roomId]);
- const callUser=()=>{
-  console.log("Calll>>>>>")
- }
+    return () => {
+      // Cleanup socket listeners to avoid memory leaks
+      socket.off("user-connected");
+      socket.off("offer");
+      socket.off("answer");
+      socket.off("ice-candidate");
+    };
+  }, [roomId]);
 
- const handleReceiveCall = ({ signal, userId }) => {
-  const peer = new Peer({
-    initiator: false,
-    trickle: false,
-    stream,
-  });
+  const callUser = (userId, stream) => {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,       //to send full signal
+      stream,
+    });
 
-  peer.on("signal", (data) => {
-    socket.emit("answer", { userId, signal: data });
-  });
+    peer.on("signal", (data) => {
+      console.log(data, ">>>data");
 
-  peer.on("stream", (userStream) => {
-    if (userVideo.current) {
-      userVideo.current.srcObject = userStream;
-    }
-  });
+      socket.emit("offer", { userId, signal: data });
+    });
 
-  peer.signal(signal);
-  peerRef.current = peer;
-};
+    peer.on("stream", (userStream) => {
+      console.log("Stream >>>>>>>>", userStream)
+      if (userVideo.current) {
+        userVideo.current.srcObject = userStream;
+        // userVideo.current.play();
+      }
+    });
 
-const handleAnswer = ({ signal }) => {
-  peerRef.current.signal(signal);
-};
+    peerRef.current = peer;
+  }
 
-const handleICECandidate = ({ candidate }) => {
-  peerRef.current.signal(candidate);
-};
+  const handleReceiveCall = ({ signal, userId }) => {
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream,
+    });
+    console.log("helllo handle receive call", { signal, userId })
+    peer.on("signal", (data) => {
+      socket.emit("answer", { userId, signal: data });
+    });
+
+    peer.on("stream", (userStream) => {
+      if (userVideo.current) {
+        userVideo.current.srcObject = userStream;
+        // userVideo.current.play();
+      }
+    });
+
+    peer.signal(signal);
+    peerRef.current = peer;
+  };
+
+  const handleAnswer = ({ signal }) => {
+    peerRef.current.signal(signal);
+  };
+
+  const handleICECandidate = ({ candidate }) => {
+    peerRef.current.signal(candidate);
+  };
   return (
     <>
-    <div>
-      <video ref={myVideo} autoPlay muted />
-      <video ref={userVideo} autoPlay />
-    </div>
+
+      <div>
+      <button className='btn btn-success'>Call</button>
+        <h1>Hello</h1>
+        <video ref={myVideo} autoPlay muted />
+        <video ref={userVideo} autoPlay />
+        
+      </div>
     </>
     // <div className="flex flex-col items-center space-y-4">
     //   <video playsInline muted ref={myVideo} autoPlay className="w-1/2 h-auto" />

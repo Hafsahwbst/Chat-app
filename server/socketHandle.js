@@ -1,32 +1,39 @@
-let onlineUsers = {};  // Mapping userId to socketId
+let onlineUsers = {}; // Mapping userId to socketId
 const socektServer = async (socket, io) => {
-
   socket.on("setup", (userData) => {
     socket.join(userData._id);
     console.log(userData._id, ">>>id");
 
     // Check if the user exists already
-    const existingUser = onlineUsers[userData._id];
-    if (existingUser) {
-      // Update socket id if user already exists in onlineUsers
-      existingUser.socketId = socket.id;
-    } else {
-      // If new user joins
-      onlineUsers[userData._id] = {
-        userId: userData._id,
-        name: userData.username,
-        socketId: socket.id,
-      };
+    // const existingUser = onlineUsers[userData._id];
+    // if (existingUser) {
+    //   // Update socket id if user already exists in onlineUsers
+    //   existingUser.socketId = socket.id;
+    // } else {
+    //   // If new user joins
+    //   onlineUsers[userData._id] = {
+    //     userId: userData._id,
+    //     name: userData.username,
+    //     socketId: socket.id,
+    //   };
+    // }
+
+    // io.emit("get-online-users", onlineUsers);
+  });
+
+  socket.on("join-room", (roomId) => {
+    console.log("roomId received:", roomId);
+    if (roomId) {
+      socket.join(roomId.toString()); // Join the room
+      socket.to(roomId.toString()).emit("user-connected", socket.id); // Emit user connection
     }
-
-    io.emit("get-online-users", onlineUsers);
-
-    // console.log(`User ${userData._id} connected with socket ID ${socket.id}`);
   });
 
-  socket.on("join chat", (room) => {
-    socket.join(room);
+  socket.on("offer", ({ userId, signal }) => {
+    io.to(userId).emit("offer", { signal, userId: socket.id });
   });
+
+  
 
   // Typing and stop typing functionality
   socket.on("typing", (room) => socket.in(room).emit("typing"));
@@ -34,12 +41,9 @@ const socektServer = async (socket, io) => {
 
   socket.on("new message", (newMessageRecieved) => {
     var chat = newMessageRecieved.chat;
-
     if (!chat.users) return console.log("chat.users not defined");
-
     chat.users.forEach((user) => {
       if (user._id == newMessageRecieved.sender._id) return;
-
       socket.in(user._id).emit("message recieved", newMessageRecieved);
     });
   });
@@ -71,11 +75,11 @@ const socektServer = async (socket, io) => {
   //     console.log("User not found for the call answer");
   //   }
   // });
-  socket.on("join-room", (roomId) => {
-    console.log("roomId>>>>>>>>>>>>>>>>",roomId)
-    socket.join(roomId?.toString());
-    socket.to(roomId?.toString()).emit("user-connected", roomId);
-  });
+  // socket.on("join-room", (roomId) => {
+  //   console.log("roomId>>>>>>>>>>>>>>>>", roomId);
+  //   socket.join(roomId?.toString());
+  //   socket.to(roomId?.toString()).emit("user-connected", roomId);
+  // });
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
 

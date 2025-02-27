@@ -4,7 +4,6 @@ import UpdateGroupChatModal from '@/app/miscelleneous/UpdateGroupChatModal';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaArrowLeft } from 'react-icons/fa';
-import { io } from 'socket.io-client';
 import ScrollableChats from '../ScrollableChats/page';
 import Profilemodal from '@/app/miscelleneous/profileModal';
 import axios from 'axios';
@@ -12,14 +11,11 @@ import { useAppContext } from '@/Context/AppProvider';
 import VoiceRecorder from '../voiceRecorder/page';
 import Video from '../video-call/page';
 
-const socket = io('http://localhost:5000',{ transports: ['websocket'] });
 var selectedChatCompare;
-
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
-  const { selectedChat, setSelectedChat, notification, setNotification,user } = useAppContext();
-  const [socketConnected, setsocketConnected] = useState(false);
+  const { selectedChat, setSelectedChat, notification, setNotification,user,socket } = useAppContext();
   const [message, setmessage] = useState([]);
   const [loading, setloading] = useState(false);
   const [newMessage, setnewMessage] = useState('');
@@ -37,7 +33,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       });
       setmessage(data);
       setloading(false);
-      socket.emit('join chat', selectedChat._id);
+      socket.emit('join-room', selectedChat._id);
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast.error('Failed to Load the Messages');
@@ -70,8 +66,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
 
     if (user) {
-      // socket.emit('setup', user);
-      socket.on('connected', () => setsocketConnected(true));
       socket.on('typing', () => setIsTyping(true));
       socket.on('stop typing', () => setIsTyping(false));
     }
@@ -158,7 +152,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
             <VoiceRecorder onSend={handleSendAudio} />
             <Video roomId={selectedChat._id} />
-
             <input
               type="text"
               className="w-full p-3 me-4 bg-gray-600 text-white rounded-md"

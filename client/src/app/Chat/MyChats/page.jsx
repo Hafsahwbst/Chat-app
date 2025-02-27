@@ -1,3 +1,4 @@
+'use client'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaPlus } from 'react-icons/fa';
@@ -6,9 +7,6 @@ import toast from 'react-hot-toast';
 import ChatLoading from '@/app/miscelleneous/chatLoading';
 import { getSender } from '@/app/config/ChatLogics/page';
 import GroupChatModal from '@/app/miscelleneous/groupChatModel';
-import { io } from 'socket.io-client';
-
-const socket = io("http://localhost:5000")
 
 const MyChats = ({  fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
@@ -18,14 +16,6 @@ const MyChats = ({  fetchAgain }) => {
     setLoggedUser(user);
   }, [user]);
 
-  useEffect(() => {
-    if(user) {
-      socket.emit('setup', user);
-      socket.on('connected', () => setsocketConnected(true));
-    }
-  })
-
-  // Fetch chats for the logged-in user
   const fetchChats = async () => {
     try {
       const { data } = await axios.get('http://localhost:5000/fetch-chat', { withCredentials: true });

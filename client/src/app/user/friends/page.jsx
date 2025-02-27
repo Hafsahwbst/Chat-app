@@ -1,10 +1,10 @@
 "use client"
+import { useAppContext } from '@/Context/AppProvider';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaUserFriends } from 'react-icons/fa';
-import { io } from 'socket.io-client';
-const socket = io("http://localhost:5000", { withCredentials: true })
+
 
 const Friends = () => {
   const [user, setUser] = useState([]);
@@ -13,6 +13,7 @@ const Friends = () => {
   const [friends, setFriends] = useState([]);
   const [notification, setnotification] = useState(null)
   const [onlineUsers, setonlineUsers] = useState([])
+  const { socket } = useAppContext()
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -48,7 +49,6 @@ const Friends = () => {
       console.error("Error fetching users:", error);
     }
   };
-
 
   // Send friend request
   const sendRequest = async (receiverId, senderId) => {

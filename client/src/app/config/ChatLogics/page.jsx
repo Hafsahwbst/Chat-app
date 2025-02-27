@@ -1,3 +1,5 @@
+'use client'
+
 export const getSender = (loggedUser, users) => {
   if (users && users?.length > 0 && users[0]?._id === loggedUser?._id) {
     return users[1]?.username;
