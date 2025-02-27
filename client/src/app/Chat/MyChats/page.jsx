@@ -6,14 +6,24 @@ import toast from 'react-hot-toast';
 import ChatLoading from '@/app/miscelleneous/chatLoading';
 import { getSender } from '@/app/config/ChatLogics/page';
 import GroupChatModal from '@/app/miscelleneous/groupChatModel';
+import { io } from 'socket.io-client';
 
-const MyChats = ({ user, fetchAgain }) => {
+const socket = io("http://localhost:5000")
+
+const MyChats = ({  fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
-  const { selectedChat, setSelectedChat, chats, setChats } = useAppContext();
+  const { selectedChat, setSelectedChat, chats,user, setChats } = useAppContext();
 
   useEffect(() => {
     setLoggedUser(user);
   }, [user]);
+
+  useEffect(() => {
+    if(user) {
+      socket.emit('setup', user);
+      socket.on('connected', () => setsocketConnected(true));
+    }
+  })
 
   // Fetch chats for the logged-in user
   const fetchChats = async () => {
@@ -29,6 +39,10 @@ const MyChats = ({ user, fetchAgain }) => {
   useEffect(() => {
     fetchChats();
   }, [fetchAgain]);
+
+  // const isUserOnline = (userId) => {
+  //   return onlineUsers.some((user) => user.userId === userId)
+  // }
 
   return (
     <div
@@ -71,6 +85,9 @@ const MyChats = ({ user, fetchAgain }) => {
                         ? getSender(loggedUser, chat.users) // Get the sender for direct chats
                         : chat.chatName}
                     </p>
+
+                    {/* <p className="px-4 py-2 text-green-500">{isUserOnline(user._id ? <span>Online</span> : <span>Offline</span>)}</p> */}
+
 
                     <div className="text-sm text-blue-200">
                       {chat.latestMessage ? (

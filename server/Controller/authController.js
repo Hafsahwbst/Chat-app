@@ -87,7 +87,7 @@ export const forgetPassword = async (req, res) => {
       return res.status(404).send({ message: "User not found" });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
+    const token = jwt.sign({ userId : user._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "10m",
     });
 

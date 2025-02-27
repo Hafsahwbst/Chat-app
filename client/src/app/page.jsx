@@ -3,7 +3,7 @@ import React from 'react'
 
 const Home = () => {
   const links = [
-    { name: 'Messages', href: '/chatPage' },
+    { name: 'Messages', href: '/chat/chatPage' },
     { name: 'Contacts', href: '/contacts' },
     { name: 'Settings', href: '/settings' },
     { name: 'Profile', href: 'user/profile' },

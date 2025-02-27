@@ -1,5 +1,5 @@
 // components/SideDrawer.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaAngleDown, FaBell, FaSearch } from 'react-icons/fa';
 import { useCookies } from 'react-cookie';
 import { useRouter } from 'next/navigation';
@@ -136,7 +136,7 @@ const SideDrawer = ({ user }) => {
                   </ul>
                 </div>
 
-                <div className="dropdown dropdown-bottom dropdown-end">
+                <div className="dropdown ms-2 dropdown-bottom dropdown-end">
                   <div tabIndex={0} role="button" className="btn m-1">
                     <div className="avatar">
                       <div className="w-8 rounded-full">

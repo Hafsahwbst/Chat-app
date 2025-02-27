@@ -11,7 +11,8 @@ const Friends = () => {
   const [sentRequests, setSentRequests] = useState(new Set());
   const [friendRequests, setFriendRequests] = useState([]);
   const [friends, setFriends] = useState([]);
-const [notification, setnotification] = useState(null)
+  const [notification, setnotification] = useState(null)
+  const [onlineUsers, setonlineUsers] = useState([])
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -32,7 +33,7 @@ const [notification, setnotification] = useState(null)
     const userId = "user._id"
     socket.emit('setup', { id: userId })
     socket.on('friend-request', (data) => {
-     setnotification(data.senderId)
+      setnotification(data.senderId)
     })
     return () => {
       socket.off('friend-request')
@@ -48,8 +49,9 @@ const [notification, setnotification] = useState(null)
     }
   };
 
+
   // Send friend request
-  const sendRequest = async (receiverId,senderId) => {
+  const sendRequest = async (receiverId, senderId) => {
     try {
       const response = await axios.post(
         'http://localhost:5000/send-request',
@@ -60,10 +62,8 @@ const [notification, setnotification] = useState(null)
       if (response.status === 201 && response.data.status) {
         toast.success("Friend request sent");
         setSentRequests((prevSet) => new Set(prevSet).add(receiverId));
-        socket.emit('friend-request', { receiverId ,senderId})
-        console.log(receiverId, ">>>>>> request sent successfully");
-        console.log(senderId,">>>Sender");
-        
+        socket.emit('friend-request', { receiverId, senderId })
+
       } else {
         toast.error("Failed to send friend request");
       }
@@ -121,7 +121,15 @@ const [notification, setnotification] = useState(null)
   useEffect(() => {
     fetchUsers();
     recieveRequests();
-  }, []);
+
+    socket.on("get-online-users", (onlineUsers) => {
+      setonlineUsers(onlineUsers)
+    })
+    return () => {
+      socket.off("get-online-users")
+    }
+  }, [socket]);
+
 
   const deletefunc = async (friendId) => {
     try {
@@ -130,7 +138,7 @@ const [notification, setnotification] = useState(null)
       }, {
         withCredentials: true
       });
-  
+
       if (data.message === "Friend removed successfully") {
         toast.success(data.message);
         router.push('/user/friends');
@@ -142,7 +150,7 @@ const [notification, setnotification] = useState(null)
       console.error(error);
     }
   };
-  
+
 
   return (
     <div className=' grid grid-cols-12 mx-5 my-2'>
@@ -157,7 +165,7 @@ const [notification, setnotification] = useState(null)
                 <div>
                   {/* Open the modal using document.getElementById('ID').showModal() method */}
                   <button className="btn" onClick={() => document.getElementById('my_modal_2').showModal()}>
-                    
+
                     <FaUserFriends />
                   </button>
                   <dialog id="my_modal_2" className="modal">
@@ -202,7 +210,6 @@ const [notification, setnotification] = useState(null)
                     {user && user.length > 0 && user.map((obj) => (
                       <tr className="border-b" key={obj._id}>
                         <td className="px-4 py-2 text-white">{obj.username}</td>
-                        <td className="px-4 py-2 text-green-500">Online</td>
                         <td className="px-4 py-2">
                           <button
                             onClick={() => sendRequest(obj._id)}
@@ -231,14 +238,14 @@ const [notification, setnotification] = useState(null)
             <h2 className='text-3xl text-white mb-6 font-bold'>Your Friends</h2>
             <ul>
               {friends.map((friend) => (
-                  <div key={friend._id} className="flex text-white items-center justify-between my-4">
+                <div key={friend._id} className="flex text-white items-center justify-between my-4">
                   <div className='flex items-center'> <li >
-                      <img className='w-12 me-4 rounded-full' src={friend.avatar && `http://localhost:5000/${friend.avatar}`} alt="" /></li>
-                    <li>{friend.username}</li></div> 
-                    <button onClick={deletefunc} className="text-red-500">
-                      Remove
-                    </button>
-                 </div>           
+                    <img className='w-12 me-4 rounded-full' src={friend.avatar && `http://localhost:5000/${friend.avatar}`} alt="" /></li>
+                    <li>{friend.username}</li></div>
+                  <button onClick={deletefunc} className="text-red-500">
+                    Remove
+                  </button>
+                </div>
               ))}
             </ul>
           </div>

@@ -1,5 +1,6 @@
 import multer from 'multer';
-import path from 'path';
+// import path from 'path';
+import fs from 'fs';
 
 
 const storage = multer.diskStorage({
@@ -11,17 +12,9 @@ const storage = multer.diskStorage({
   },
 });
 
-
-// const fileFilter = (req, file, cb) => {
-//   console.log("")
-//     if((file.mimetype).includes('jpeg') || (file.mimetype).includes('png') || (file.mimetype).includes('jpg')){
-//         cb(null, true);
-//     } else{
-//         cb(null, false);
-//     }
-// };
-
-
+const upload = multer({
+  storage: storage,
+});
 
 const voicestorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -29,14 +22,14 @@ const voicestorage = multer.diskStorage({
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    cb(null, dir); // where to save the file
+    cb(null, dir);
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
 
-// Filter for file type validation
+// File filter for audio validation
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['audio/wav', 'audio/mp3'];
   if (allowedTypes.includes(file.mimetype)) {
@@ -46,10 +39,10 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter, 
-  voicestorage:voicestorage,
+// Create separate multer instance for voice messages
+export const voiceUpload = multer({
+  storage: voicestorage,
+  fileFilter: fileFilter,
 });
 
 // app.post('/api/upload-voice-message', upload.single('audio'), (req, res) => {

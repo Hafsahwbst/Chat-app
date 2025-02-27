@@ -33,6 +33,11 @@ const Chat = () => {
     fetchUser();
   }, []);
 
+// useEffect(() => {
+//   socket.emit('setup', (user))
+// })
+  
+
   return (
     <div style={{ width: "100%" }}>
       <SideDrawer user={user} setselectedChat={setselectedChat} />

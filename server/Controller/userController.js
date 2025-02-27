@@ -4,7 +4,7 @@ dotenv.config();
 
 export const getProfile = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.user.id;
     const user = await User.findById(userId, {
       email: 1,
       username: 1,
@@ -28,11 +28,11 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    if (!req.userId) {
+    if (!req.user) {
       return res.status(401).json({ message: "User not authenticated" });
     }
 
-    const userId = req.userId;
+    const userId = req.user.id;
     console.log("UserId>>>>>>", userId);
     const updateData = req.body;
     console.log(req.body);
@@ -56,11 +56,11 @@ export const updateProfile = async (req, res) => {
 };
 export const deleteProfile = async (req, res) => {
   try {
-    if (!req.userId) {
+    if (!req.user) {
       return res.status(401).json({ message: "User not authenticated" });
     }
 
-    const userId = req.userId;
+    const userId = req.user.id;
     console.log(req.userId, ">>>>>REq");
 
     const user = await User.findByIdAndDelete(userId);
@@ -79,7 +79,7 @@ export const deleteProfile = async (req, res) => {
 };
 
 export const authoriseUser = (req, res) => {
-  if (!req.userId) {
+  if (!req.user) {
     return res.status(401).json({ message: "User not authenticated" });
   }
   res.status(200).json({ allowed: true });
@@ -93,7 +93,7 @@ export const uploadFile = (req, res) => {
 };
 
 export const allusers = async (req, res) => {
-  const userId = req.userId;
+  const userId = req.user.id;
   const keyword = req.query.search
     ? {
         $or: [

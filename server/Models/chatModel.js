@@ -7,7 +7,7 @@ const chatSchema = new mongoose.Schema(
     isGroupChat: { type: Boolean, default: "false" },
     latestMessage: { type: mongoose.Types.ObjectId, ref: "Message" },
     groupAdmin: { type: mongoose.Types.ObjectId, ref: "User" },
-    filePath: { type: String, required: true },
+    filePath: { type: String, required: false },
     timestamp: { type: Date, default: Date.now }
   },
   {

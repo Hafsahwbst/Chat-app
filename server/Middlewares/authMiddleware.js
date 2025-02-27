@@ -5,14 +5,15 @@ import jwt from "jsonwebtoken";
 import { createSecretToken } from "../util/SecretToken.js";
 
 export const userVerification = async (req, res, next) => {
-  const token = req.cookies.token; // or req.headers.authorization depending on your setup
+  const token = req?.cookies.token; 
+  
   if (!token) {
     return res.status(401).json({ message: "No token found" });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.TOKEN_KEY);
-    const user = await User.findById(decoded.id); // Assuming your token contains the user ID
+    const user = await User.findById(decoded.id); 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

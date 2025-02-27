@@ -6,6 +6,7 @@ import userRoute from "./Routes/userRoute.js";
 import friendRoute from "./Routes/friendRoute.js";
 import chatRoute from "./Routes/chatRoute.js";
 import messageRoute from "./Routes/messageRoute.js";
+import SocketServer from './socketHandle.js'
 
 import dotenv from "dotenv";
 import db from "./config/db/connection.js";
@@ -39,7 +40,7 @@ const server = app.listen(PORT, () => {
 });
 
 const io = new Server.Server(server, {
-  pingTimeout: 60000, //the amount of tim eit will wait being inactive like if anyone is bot active till 60 secods it is going to close the bandwisdth
+  pingTimeout: 60000, //the amount of time it will wait being inactive like if anyone is bot active till 60 secods it is going to close the bandwisdth
   cors: {
     origin: "http://localhost:3000",
     credentials: true,
@@ -47,44 +48,6 @@ const io = new Server.Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("Connected to socket.io");
-  socket.on("setup", (userData) => {
-    socket.join(userData._id);
-    socket.emit("connected");
-  });
-
-  socket.on("join chat", (room) => {
-    socket.join(room);
-    console.log("User Joined Room: " + room);
-  });
-
-  // for typing functionality
-  socket.on("typing", (room) => socket.in(room).emit("typing"));
-//for stop typing
-  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
-
-  socket.on("new message", (newMessageRecieved) => {
-    var chat = newMessageRecieved.chat;
-
-    if (!chat.users) return console.log("chat.users not defined");
-
-    chat.users.forEach((user) => {
-      if (user._id == newMessageRecieved.sender._id) return;
-
-      
-      socket.in(user._id).emit("message recieved", newMessageRecieved);
-    });
-  });
-
-  socket.on("friend-request", (data) => {
-    const {senderId,recieverId } = data
-    if (userData[recieverId]) { 
-      io.to(userData[recieverId].emit(`Friend request recieved `,{senderId}))
-    }
-  })
-
-  socket.off("setup", () => {
-    console.log("USER DISCONNECTED");
-    socket.leave(userData._id);
-  });
+  console.log("Connected to socket", socket.id);
+  SocketServer(socket,io)
 });

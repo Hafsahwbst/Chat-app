@@ -69,4 +69,33 @@ const ScrollableChats = ({ message, user, isGroupChat }) => {
   );
 };
 
+// const ScrollableChats = ({ message, user, isGroupChat }) => {
+//   if (!message || message.length === 0) {
+//     return <div>No messages to display</div>;
+//   }
+
+//   return (
+//     <div className="w-full h-full">
+//       {message.map((msg, i) => {
+//         const isUserMessage = msg.sender?._id === user._id;
+
+//         return (
+//           <div key={msg._id} className={`mb-2 ${isUserMessage ? 'text-right' : 'text-left'}`}>
+//             {isGroupChat && msg.sender && <div className="text-sm text-gray-400">{msg.sender.username}</div>}
+            
+//             {msg.audio ? (
+//               <audio controls src={`http://localhost:5000/${msg.content}`} className="w-full mt-2"></audio>
+//             ) : (
+//               <div className={`${isUserMessage ? 'bg-blue-400' : 'bg-gray-400'} text-white p-3 rounded-xl`}>{msg.content}</div>
+//             )}
+//           </div>
+//         );
+//       })}
+//     </div>
+//   );
+// };
+
+
+
+
 export default ScrollableChats;

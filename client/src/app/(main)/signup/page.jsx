@@ -59,8 +59,8 @@ const Signup = () => {
 
   return (
 
-    <div className="container-fluid h-screen flex items-center  justify-center ">
-    <div className="container grid grid-cols-2 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 h-3/4 rounded-3xl shadow-xl bg-gradient-to-b  from-gray-200 via-pink-100 to-pink-200">
+    <div className="container-fluid h-screen flex items-center bg-gradient-to-b  from-gray-700 to-gray-800  justify-center ">
+    <div className="container grid grid-cols-2 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 h-3/4 rounded-3xl bg-transparent text-white">
     <div className="flex  justify-center">
         <img src="https://cdni.iconscout.com/illustration/premium/thumb/login-3305943-2757111.png" className="h-full p-8 hide-on-mobile" alt="" />
       </div>
@@ -68,7 +68,7 @@ const Signup = () => {
         <p className="text-4xl text-start mb-2 font-bold">
         Create an account
         </p>
-        <p className="mb-8 text-gray-700 text-lg">Already have an account ? <Link href="/login" className="text-blue-500">Login</Link></p>
+        <p className="mb-8 text-gray-400 text-lg">Already have an account ? <Link href="/login" className="text-blue-500">Login</Link></p>
       <form className="w-1/2" onSubmit={handleSubmit}>
         <div>
           <label htmlFor="email" className="block mb-2 text-indigo-500 font-extrabold">Email</label>
@@ -77,7 +77,7 @@ const Signup = () => {
             name="email"
             value={email}
             required
-            className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-white shadow border-2 border-indigo-400 rounded"
+            className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-transparent shadow border-2 border-indigo-400 rounded"
 
             placeholder="Enter your email"
             onChange={handleOnChange}
@@ -90,7 +90,7 @@ const Signup = () => {
             name="username"
             value={username}
             required
-            className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-white shadow border-2 border-indigo-400 rounded"
+            className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-transparent shadow border-2 border-indigo-400 rounded"
 
             placeholder="Enter your username"
             onChange={handleOnChange}
@@ -103,7 +103,7 @@ const Signup = () => {
             name="password"
             required
             value={password}
-            className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-white shadow border-2 border-indigo-400 rounded"
+            className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-transparent shadow border-2 border-indigo-400 rounded"
 
             placeholder="Enter your password"
             onChange={handleOnChange}

@@ -34,13 +34,13 @@ const Login = () => {
   return (
 
     <>
-      <div className="container-fluid h-screen flex items-center  justify-center">
-        <div className="container grid grid-cols-2 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 h-3/4 rounded-3xl shadow-xl bg-gradient-to-b  from-gray-200 via-pink-100 to-pink-200">
+      <div className="container-fluid h-screen bg-gradient-to-b  from-gray-700 to-gray-800 flex items-center  justify-center">
+        <div className="container grid grid-cols-2  sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 h-3/4 rounded-3xl text-white bg-transparent">
           <div className="flex justify-center  items-center h-full flex-col">
             <p className="text-4xl text-start mb-2 font-bold">
               Login
             </p>
-            <p className="mb-8 font-bold text-gray-700 text-lg">New User ? <Link href="/signup" className="text-blue-500">Signup</Link></p>
+            <p className="mb-8 font-bold text-gray-400 text-lg">New User ? <Link href="/signup" className="text-blue-500">Signup</Link></p>
             <form className="w-1/2" onSubmit={handleSubmit}>
             <div>
                 <label htmlFor="email" className="block mb-2 text-indigo-500 font-extrabold">Email</label>
@@ -48,7 +48,7 @@ const Login = () => {
                   type="email"
                   name="email"
                   value={email}
-                className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-white shadow border-2 border-indigo-400 rounded"
+                className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-transparent shadow border-2 border-indigo-400 rounded"
                   placeholder="Enter your email"
                   required
                   onChange={(e) => setEmail(e.target.value)}
@@ -67,7 +67,7 @@ const Login = () => {
                   type="password"
                   name="password"
                   required
-                  className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-white shadow border-2 border-indigo-400 rounded"
+                  className="inline-block w-full p-4 leading-6 mb-8 text-lg font-extrabold placeholder-indigo-400 bg-transparent shadow border-2 border-indigo-400 rounded"
 
                   value={password}
                   placeholder="Enter your password"
