@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mui/material": "^6.4.6",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "formik": "^2.4.6",
