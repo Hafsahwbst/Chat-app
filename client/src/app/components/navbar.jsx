@@ -57,7 +57,7 @@ const Navbar = () => {
                     <Link href="/" aria-current="page">
                       <img src="/Talk-a-tive.png" className="w-20" alt="Logo" />
                     </Link>
-                    <Link href="/chat/chatPage" className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white">
+                    <Link href="/chat/message/chatPage" className="block rounded-md px-3 py-2 text-base font-medium text-gray-800 hover:bg-gray-700 hover:text-white">
                       Chat
                     </Link>
                     <a href="#" className="rounded-md px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-700 hover:text-white">
@@ -103,7 +103,7 @@ const Navbar = () => {
                       Hafsah
                       </Link>
                       </div> 
-                      <Link href="/chat/chatPage" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-0">
+                      <Link href="/chat/message/chatPage" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-0">
                         Chat
                       </Link>
                       <Link href="/user/friends" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-1">

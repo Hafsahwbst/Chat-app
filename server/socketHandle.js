@@ -1,39 +1,81 @@
+const users = {}; // to store connected users and their socket ids
 let onlineUsers = {}; // Mapping userId to socketId
 const socektServer = async (socket, io) => {
-  socket.on("setup", (userData) => {
-    socket.join(userData._id);
-    console.log(userData._id, ">>>id");
-
-    // Check if the user exists already
-    // const existingUser = onlineUsers[userData._id];
-    // if (existingUser) {
-    //   // Update socket id if user already exists in onlineUsers
-    //   existingUser.socketId = socket.id;
-    // } else {
-    //   // If new user joins
-    //   onlineUsers[userData._id] = {
-    //     userId: userData._id,
-    //     name: userData.username,
-    //     socketId: socket.id,
-    //   };
-    // }
-
-    // io.emit("get-online-users", onlineUsers);
+  socket.on("setup", (user) => {
+    users[user._id] = socket.id;
+    console.log("User:", user._id);
+    socket.emit("connected");
   });
 
+  // Handle room joining
   socket.on("join-room", (roomId) => {
-    console.log("roomId received:", roomId);
-    if (roomId) {
-      socket.join(roomId.toString()); // Join the room
-      socket.to(roomId.toString()).emit("user-connected", socket.id); // Emit user connection
+    socket.join(roomId);
+    socket.roomId = roomId; // Store the room ID on the socket for reference
+    console.log(`User ${socket.id} joined room: ${roomId}`);
+
+    // Notify other users in the room
+    socket.to(roomId).emit("user-connected", socket.id);
+  });
+
+  // Handle call initiation
+  socket.on("call-started", ({ receiverId, callerId }) => {
+    if (!receiverId || !callerId) {
+      return;
+    }
+    io.to(receiverId).emit("call-started", callerId);
+  });
+
+  socket.on("call-user", ({ calleeId, caller }) => {
+    const roomId = caller.roomId || socket.roomId;
+    const callerWithRoom = { ...caller, roomId };
+    io.to(calleeId).emit("incoming-call", { caller: callerWithRoom });
+  });
+
+  socket.on("offer", ({ userId, signal, receiverId }) => {
+    if (receiverId) {
+      io.to(receiverId).emit("offer", {
+        signal,
+        receiverId: socket.id, // The recipient needs to know who to respond to
+        caller: { id: socket.id },
+      });
     }
   });
 
-  socket.on("offer", ({ userId, signal }) => {
-    io.to(userId).emit("offer", { signal, userId: socket.id });
+  socket.on("answer", ({ receiverId, signal }) => {
+    io.to(receiverId).emit("answer", { signal });
   });
 
-  
+  // Handle call acceptance
+  socket.on("call-accepted", ({ callerId, accepterId }) => {
+    io.to(callerId).emit("call-accepted", { accepterId });
+  });
+
+  // Handle call declining
+  socket.on("call-declined", ({ userId }) => {
+    io.to(userId).emit("call-declined", { message: "User declined the call" });
+  });
+
+  // Handle ICE candidates
+  socket.on("ice-candidate", ({ userId, candidate }) => {
+    io.to(userId).emit("ice-candidate", { candidate });
+  });
+
+  // Handle room leaving
+  socket.on("leave-room", (roomId) => {
+    socket.leave(roomId);
+    // Notify other users in the room
+    socket.to(roomId).emit("user-disconnected", socket.id);
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log(`User ${socket.id} disconnected`);
+
+    // If the user was in a room, notify others
+    if (socket.roomId) {
+      socket.to(socket.roomId).emit("user-disconnected", socket.id);
+    }
+  });
 
   // Typing and stop typing functionality
   socket.on("typing", (room) => socket.in(room).emit("typing"));
@@ -48,38 +90,14 @@ const socektServer = async (socket, io) => {
     });
   });
 
-  // Handling user-to-user call
-  // socket.on("callUser", ({ userToCall, signalData, from }) => {
-  //   console.log("Calling user:", userToCall);
-  //   console.log("Signal data:", signalData);  // This should not be undefined
-  //   console.log("From user:", from);
+  // Event to initiate an audio call (send the call info to the receiver)
+  socket.on("initiate-call", (receiverId, senderId) => {
+    const receiverSocketId = users[receiverId];
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("incoming-call", senderId);
+    }
+  });
 
-  //   if (onlineUsers[userToCall]) {
-  //     io.to(onlineUsers[userToCall].socketId).emit("callIncoming", {
-  //       signal: signalData,
-  //       from,
-  //     });
-  //   } else {
-  //     console.log("User not found for the call");
-  //   }
-  // });
-
-  // // Answer call logic
-  // socket.on("answerCall", (data) => {
-  //   console.log("Answering call for:", data.to);
-  //   console.log("Signal:", data.signal);
-
-  //   if (onlineUsers[data.to]) {
-  //     io.to(onlineUsers[data.to].socketId).emit("callAccepted", data.signal);
-  //   } else {
-  //     console.log("User not found for the call answer");
-  //   }
-  // });
-  // socket.on("join-room", (roomId) => {
-  //   console.log("roomId>>>>>>>>>>>>>>>>", roomId);
-  //   socket.join(roomId?.toString());
-  //   socket.to(roomId?.toString()).emit("user-connected", roomId);
-  // });
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
 

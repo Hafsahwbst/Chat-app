@@ -51,7 +51,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain, user }
         // setFetchAgain(!fetchAgain);
         toast.success("Group name updated successfully");
         setRenameLoading(false)
-        router.push('/chat/chatPage');
+        router.push('/message/chat/chatPage');
       } else {
         toast.error('Failed to rename group');
       }

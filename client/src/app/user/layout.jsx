@@ -242,7 +242,7 @@ const Layout = ({ children }) => {
             </li> */}
                     <li className="hs-accordion" id="projects-accordion">
                       <Link
-                        href="/chat/chatPage"
+                        href="/chat/message/chatPage"
                         className="hs-accordion-toggle w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-white rounded-lg hover:bg-white/10 focus:outline-none focus:bg-white/10"
                         aria-expanded="true"
                         aria-controls="projects-accordion-child"

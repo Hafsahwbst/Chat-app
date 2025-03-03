@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Chatbox from '@/app/Chat/ChatBox/page'; // Make sure this path is correct
-import Mychats from '@/app/Chat/MyChats/page';  // Make sure this path is correct
-import SideDrawer from '@/app/miscelleneous/SideDrawer'; // Make sure this path is correct
 import axios from 'axios';
 import { useAppContext } from '@/Context/AppProvider';
+import SideDrawer from '@/app/miscelleneous/SideDrawer';
+import MyChats from '../MyChats/page';
+import Chatbox from '../ChatBox/page';
 
 const Chat = () => {
   const [user, setUser] = useState(null);
@@ -44,7 +44,7 @@ const Chat = () => {
       <div className="container-fluid bg-[url('https://images.squarespace-cdn.com/content/v1/63e991ddebdc00680331f4fa/d4ce3e31-6f96-439d-8918-4e6318285ec9/Untitled-1.png?format=2500w')] object-cover bg-cover flex justify-between w-screen p-10 " style={{height:"90vh"}}>
         {user ? (
           <>
-            <Mychats  fetchAgain={fetchAgain} user={user} />
+            <MyChats  fetchAgain={fetchAgain} user={user} />
             <Chatbox  fetchAgain={fetchAgain} setfetchAgain={setfetchAgain}  user={user} />
           </>
         ) : (

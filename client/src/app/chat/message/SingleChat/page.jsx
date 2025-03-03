@@ -3,25 +3,24 @@ import { getSender, getSenderFull } from '@/app/config/ChatLogics/page';
 import UpdateGroupChatModal from '@/app/miscelleneous/UpdateGroupChatModal';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaVideo } from 'react-icons/fa';
 import ScrollableChats from '../ScrollableChats/page';
 import Profilemodal from '@/app/miscelleneous/profileModal';
 import axios from 'axios';
 import { useAppContext } from '@/Context/AppProvider';
-import VoiceRecorder from '../voiceRecorder/page';
-import Video from '../video-call/page';
+import { useRouter } from 'next/navigation';
+import Audio from '../../audio/audio-call/page';
 
 var selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-
-  const { selectedChat, setSelectedChat, notification, setNotification,user,socket } = useAppContext();
+  const { selectedChat, setSelectedChat, notification, setNotification, user, socket } = useAppContext();
   const [message, setmessage] = useState([]);
   const [loading, setloading] = useState(false);
   const [newMessage, setnewMessage] = useState('');
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
-
+  const router = useRouter();
 
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -93,30 +92,33 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
   });
 
-  const handleSendAudio = async (audioBlob) => {
-    const formData = new FormData();
-    formData.append('audio', audioBlob, 'voice_message.wav');
-
-    try {
-      const response = await axios.post(
-        'http://localhost:5000/api/upload-voice-message',
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
-
-      if (response.data.filePath) {
-        const audioMessage = {
-          content: response.data.filePath,
-          audio: true,
-          chatId: selectedChat._id,
-        };
-
-        socket.emit('new message', audioMessage);
-        setmessage((prevMessages) => [...prevMessages, audioMessage]);
-      }
-    } catch (error) {
-      console.error('Error uploading audio:', error);
+  // Video call functionality
+  const startCall = () => {
+    if (!selectedChat || !user) return;
+    
+    // Find the receiver ID (the other user in the chat)
+    const receiverId = selectedChat.users.find(u => u._id !== user._id)?._id;
+    if (!receiverId) {
+      toast.error("Cannot identify the call recipient");
+      return;
     }
+
+    const roomId = selectedChat._id;
+    
+    // Emit the call-started event to the socket
+    socket.emit('call-started', { receiverId, callerId: user._id });
+    
+    // Emit the call-user event to notify the receiver
+    socket.emit('call-user', { 
+      calleeId: receiverId, 
+      caller: { 
+        id: user._id, 
+        username: user.name || user.username || "User" 
+      } 
+    });
+    
+    // Navigate to the video call page
+    router.push(`/chat/video/video-call/${roomId}`);
   };
 
   return (
@@ -150,8 +152,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
             {istyping && <div className="flex justify-start mb-3"><span className="loading loading-dots loading-lg text-white"></span></div>}
 
-            <VoiceRecorder onSend={handleSendAudio} />
-            <Video roomId={selectedChat._id} />
+          <div>
+            <Audio />
+          </div>
+
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-white">Chat with {getSender(user, selectedChat.users)}</h2>
+              {!selectedChat.isGroupChat && (
+                <button className='btn btn-primary flex items-center gap-2' onClick={startCall}>
+                  <FaVideo /> Start Call
+                </button>
+              )}
+            </div>
+
             <input
               type="text"
               className="w-full p-3 me-4 bg-gray-600 text-white rounded-md"
