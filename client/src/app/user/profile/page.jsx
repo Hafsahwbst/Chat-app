@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -46,40 +46,41 @@ const Profile = () => {
   };
 
   return (
-    <div className="container-fluid  h-2/3">
+    <div className="container mx-auto p-4 md:p-8">
       <title>User Profile</title>
       {user ? (
-        <div className=" flex justify-center flex-col bg-gradient-to-b  from-gray-700 to-gray-800  p-16 rounded-xl shadow-2xl max-w-4xl w-full h-full transition-all duration-300 animate-fade-in">
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/3 text-center mb-8 md:mb-0">
+        <div className="bg-gradient-to-b from-gray-700 to-gray-800 p-8 rounded-xl shadow-2xl max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-center items-center">
+            {/* Profile Image and Edit/Delete Buttons */}
+            <div className="text-center md:w-1/3 mb-8 md:mb-0">
               <img
                 src={user.avatar && `${'http://localhost:5000'}/${user.avatar}`}
                 alt="Profile Picture"
                 className="rounded-full w-48 h-48 mx-auto mb-4 border-4 border-indigo-600 dark:border-blue-800 transition-transform duration-300 hover:scale-105"
               />
-              <h1 className="text-2xl font-bold text-white mb-2">
-                <div>
-                  <p>{user.username}</p>
-                </div>
-              </h1>
-              <button onClick={() => router.push("/user/edit-profile")} className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-300">
-                Edit Profile
-              </button>
-              <button className="bg-red-600 mx-2 text-white px-4 py-2 rounded-lg mt-4 hover:bg-red-700 transition-colors duration-300" onClick={deletefunc}>
-                Delete Profile
-              </button>
+              <h1 className="text-2xl font-bold text-white mb-2">{user.username}</h1>
+              <div className="space-x-2">
+                <button
+                  onClick={() => router.push("/user/edit-profile")}
+                  className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-300"
+                >
+                  Edit Profile
+                </button>
+                <button
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg mt-4 hover:bg-red-700 transition-colors duration-300"
+                  onClick={deletefunc}
+                >
+                  Delete Profile
+                </button>
+              </div>
             </div>
-            <div className="md:w-2/3 md:pl-8">
-              <h2 className="text-xl font-semibold text-indigo-500 mb-4">
-                Bio
-              </h2>
-              <p className="text-gray-300 mb-6">
-                {user.bio}
-              </p>
 
-              <h2 className="text-xl font-semibold text-indigo-500 mb-4">
-                Contact Information
-              </h2>
+            {/* Profile Details */}
+            <div className="md:w-2/3 md:pl-8">
+              <h2 className="text-xl font-semibold text-indigo-500 mb-4">Bio</h2>
+              <p className="text-gray-300 mb-6">{user.bio}</p>
+
+              <h2 className="text-xl font-semibold text-indigo-500 mb-4">Contact Information</h2>
               <ul className="space-y-2 text-gray-300">
                 <li className="flex items-center">
                   <svg
@@ -126,12 +127,8 @@ const Profile = () => {
       ) : (
         <p className="text-center text-gray-300">Loading...</p>
       )}
-      <style
-        dangerouslySetInnerHTML={{
-          __html:
-            "\n        @keyframes fadeIn {\n            from { opacity: 0; transform: translateY(-10px); }\n            to { opacity: 1; transform: translateY(0); }\n        }\n        .animate-fade-in {\n            animation: fadeIn 0.5s ease-out forwards;\n        }\n    "
-        }}
-      />
+
+    
     </div>
   );
 };

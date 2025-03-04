@@ -58,12 +58,12 @@ const Edit = () => {
 
   const uploadFile = (e) => {
     const file = e.target.files[0];
-    setFile(file); 
+    setFile(file);
     const fd = new FormData();
     fd.append("file", file);
     axios
       .post("http://localhost:5000/upload", fd, {
-        withCredentials: true, 
+        withCredentials: true,
       })
       .then((res) => {
         if (res.status === 200) {
@@ -76,9 +76,9 @@ const Edit = () => {
   };
 
   return (
-    <div className="container-fluid h-full text-white">
-      <div className="rounded-xl shadow-2xl max-w-4xl w-full p-8  bg-gray-800 transition-all duration-300">
-        <h2 className="text-2xl font-bold text-indigo-500 mb-4">Edit Profile</h2>
+    <div className="container mx-auto p-4 md:p-8">
+      <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-4xl mx-auto transition-all duration-300">
+        <h2 className="text-2xl font-bold text-indigo-500 mb-6">Edit Profile</h2>
         {user ? (
           <Formik
             initialValues={{
@@ -87,26 +87,30 @@ const Edit = () => {
               phoneNo: user.phoneNo || "",
               email: user.email || "",
               address: user.address || "",
-              avatar: user.avatar || "", 
+              avatar: user.avatar || "",
             }}
             onSubmit={handleSubmit}
           >
             {({ values, handleChange, handleSubmit }) => (
               <form onSubmit={handleSubmit}>
-                <img
-                  src={user.avatar && `${'http://localhost:5000'}/${user.avatar}`}
-                  className="w-32 rounded-full h-32 mx-auto mb-4"
-                  alt="User Avatar"
-                />
-                <div className="my-3">
-                  <h1 className="text-lg font-semibold text-indigo-500">File Uploader</h1>
-                  <input
-                    type="file"
-                    className="shadow-sm bg-gray-700 text-gray-300 border border-gray-600 rounded-lg p-2.5 mb-3"
-                    onChange={uploadFile}
-                    placeholder=""
+                <div className="text-center grid grid-cols-8 mb-6">
+                 <div className="col-span-2">
+                  <img
+                    src={user.avatar && `${"http://localhost:5000"}/${user.avatar}`}
+                    className="w-32 h-32 rounded-full mx-auto  border-4 border-indigo-600 dark:border-blue-800 transition-transform duration-300 hover:scale-105"
+                    alt="User Avatar"
                   />
+                  </div>
+                  <div className="col-span-6 mt-3">
+                    <h3 className="text-sm font-medium text-gray-300 mb-2">Upload New Avatar</h3>
+                    <input
+                      type="file"
+                      className="block w-full text-gray-300 bg-gray-700 p-3 rounded-lg"
+                      onChange={uploadFile}
+                    />
+                  </div>
                 </div>
+
                 <div className="mb-4">
                   <label htmlFor="username" className="block text-sm font-medium text-gray-300">
                     Username
@@ -120,6 +124,7 @@ const Edit = () => {
                     className="mt-2 p-3 w-full bg-gray-700 text-white border border-gray-600 rounded-lg"
                   />
                 </div>
+
                 <div className="mb-4">
                   <label htmlFor="bio" className="block text-sm font-medium text-gray-300">
                     Bio
@@ -133,6 +138,7 @@ const Edit = () => {
                     className="mt-2 p-3 w-full bg-gray-700 text-white border border-gray-600 rounded-lg"
                   />
                 </div>
+
                 <div className="mb-4">
                   <label htmlFor="phoneNo" className="block text-sm font-medium text-gray-300">
                     Phone Number
@@ -146,6 +152,7 @@ const Edit = () => {
                     className="mt-2 p-3 w-full bg-gray-700 text-white border border-gray-600 rounded-lg"
                   />
                 </div>
+
                 <div className="mb-4">
                   <label htmlFor="email" className="block text-sm font-medium text-gray-300">
                     Email
@@ -159,6 +166,7 @@ const Edit = () => {
                     className="mt-2 p-3 w-full bg-gray-700 text-white border border-gray-600 rounded-lg"
                   />
                 </div>
+
                 <div className="mb-4">
                   <label htmlFor="address" className="block text-sm font-medium text-gray-300">
                     Address
@@ -172,6 +180,7 @@ const Edit = () => {
                     className="mt-2 p-3 w-full bg-gray-700 text-white border border-gray-600 rounded-lg"
                   />
                 </div>
+
                 <div className="flex justify-center gap-4">
                   <button
                     type="button"

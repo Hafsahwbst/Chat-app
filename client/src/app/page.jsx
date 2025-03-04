@@ -1,7 +1,17 @@
+'use client'
 import Navbar from '@/app/components/navbar'
-import React from 'react'
+import { useAppContext } from '@/Context/AppProvider'
+import { useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
 
 const Home = () => {
+  const router = useRouter()
+  const { user } = useAppContext()
+  useEffect(() => {
+    if (!user) {
+      router.push('/login')
+    }
+  }, [router])
   const links = [
     { name: 'Messages', href: '/chat/message/chatPage' },
     { name: 'Contacts', href: '/contacts' },

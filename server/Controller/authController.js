@@ -31,40 +31,34 @@ export const Signup = async (req, res, next) => {
 export const Login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
     // Check if email and password are provided
     if (!email || !password) {
       return res.json({ message: "All fields are required" });
     }
-
     // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.json({ message: "Incorrect password or email" });
     }
-
     // Compare the provided password with the stored hashed password
     const auth = await bcrypt.compare(password, user.password);
     if (!auth) {
       return res.json({ message: "Incorrect password or email" });
     }
-
     // Create access token and refresh token
     const Token = createSecretToken(user._id);
     const refreshToken = createRefreshToken(user._id);
-
     // Store the refresh token in a cookie (optional: secure and HttpOnly)
     res.cookie('refresh_token', refreshToken, {
       withCredentials: true,
       httpOnly: false,  // Set to true for added security if necessary
     });
-
     // Store the access token in a cookie
     res.cookie('token', Token, {
       withCredentials: true,
       httpOnly: false,  // Set to true for added security if necessary
     });
-
+    
     // Send the response with the access token and user info
     return res.json({ 
       status: true, 

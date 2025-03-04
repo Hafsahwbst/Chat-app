@@ -91,10 +91,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
   });
 
-  // Video call functionality
-  const startCall = () => {
-    if (!selectedChat || !user) return;
-    
+
+  const initiateCall = (callType) => {
+    if (!selectedChat || !user) {
+      toast.error("Cannot start call - missing chat or user data");
+      return;
+    }
+
+    // Only allow one-to-one calls, not group calls
+    if (selectedChat.isGroupChat) {
+      toast.error("Group calls are not supported");
+      return;
+    }
+
     // Find the receiver ID (the other user in the chat)
     const receiverId = selectedChat.users.find(u => u._id !== user._id)?._id;
     if (!receiverId) {
@@ -103,21 +112,23 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
 
     const roomId = selectedChat._id;
-    
-    // Emit the call-started event to the socket
-    socket.emit('call-started', { receiverId, callerId: user._id });
-    
+    console.log(`Initiating ${callType} call to ${receiverId} in room ${roomId}`);
+
     // Emit the call-user event to notify the receiver
-    socket.emit('call-user', { 
-      calleeId: receiverId, 
-      caller: { 
-        id: user._id, 
-        username: user.name || user.username || "User" 
-      } 
+    socket.emit('call-user', {
+      calleeId: receiverId,
+      caller: {
+        id: user._id,
+        username: user.name || user.username || "User",
+        roomId: roomId
+      },
+      callType: callType,
     });
-    
-    // Navigate to the video call page
-    router.push(`/chat/video/video-call/${roomId}`);
+    if (callType === 'video') {
+      router.push(`/chat/video/video-call/${roomId}`);
+    }
+    router.push(`/chat/audio/audio-call/${roomId}`);
+
   };
 
   return (
@@ -151,9 +162,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
             {istyping && <div className="flex justify-start mb-3"><span className="loading loading-dots loading-lg text-white"></span></div>}
 
-          <div>
-            <Audio />
-          </div>
+            <div>
+              <Audio />
+            </div>
 
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-white">Chat with {getSender(user, selectedChat.users)}</h2>
@@ -163,6 +174,32 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 </button>
               )}
             </div>
+
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-white">Call  {getSender(user, selectedChat.users)}</h2>
+
+              {!selectedChat.isGroupChat && (
+                <div className="flex gap-2">
+                  <button
+                    className='btn btn-primary flex items-center gap-2'
+                    onClick={() => initiateCall('audio')}
+                    aria-label="Start audio call"
+                  >
+                    <IoMdCall /> Audio Call
+                  </button>
+
+                  <button
+                    className='btn btn-success flex items-center gap-2'
+                    onClick={() => initiateCall('video')}
+                    aria-label="Start video call"
+                  >
+                    <FaVideo /> Video Call
+                  </button>
+                </div>
+              )}
+            </div>
+
+
 
             <input
               type="text"

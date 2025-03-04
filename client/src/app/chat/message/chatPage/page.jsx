@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+
 import axios from 'axios';
 import { useAppContext } from '@/Context/AppProvider';
 import SideDrawer from '@/app/miscelleneous/SideDrawer';
-import MyChats from '../MyChats/page';
 import Chatbox from '../ChatBox/page';
+import MyChats from '../MyChats/page';
 
 const Chat = () => {
   const [user, setUser] = useState(null);
@@ -37,6 +38,7 @@ const Chat = () => {
 //   socket.emit('setup', (user))
 // })
   
+console.log(user,">>>user");
 
   return (
     <div style={{ width: "100%" }}>

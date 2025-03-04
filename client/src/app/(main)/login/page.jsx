@@ -22,8 +22,10 @@ const Login = () => {
 
       if (data.status) {
         toast.success("Logged in")
+        console.log(data,">>>>data");
         router.push('/user/profile');
       } else {
+        
         toast.error('Login failed');
       }
     } catch (error) {
