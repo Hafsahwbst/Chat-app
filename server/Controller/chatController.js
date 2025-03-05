@@ -193,8 +193,6 @@ export const voiceMessage = async (req, res) => {
   }
 
   console.log('Audio uploaded:', req.file);
-  res.json({
-    message: 'File uploaded successfully',
-    filePath: `/uploads/${req.file.filename}`,
-  })
+  const audioUrl = `/uploads/voiceMessages/${req.file.filename}`;
+  res.json({ audioUrl });
 }

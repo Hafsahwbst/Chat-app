@@ -37,8 +37,7 @@ const Chat = () => {
 // useEffect(() => {
 //   socket.emit('setup', (user))
 // })
-  
-console.log(user,">>>user");
+
 
   return (
     <div style={{ width: "100%" }}>

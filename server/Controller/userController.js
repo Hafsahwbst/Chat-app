@@ -85,13 +85,6 @@ export const authoriseUser = (req, res) => {
   res.status(200).json({ allowed: true });
 };
 
-export const uploadFile = (req, res) => {
-  if (!req.file) {
-    return res.status(400).send("Please upload a valid image");
-  }
-  res.send("Single file uploaded successfully");
-};
-
 export const allusers = async (req, res) => {
   const userId = req.user.id;
   const keyword = req.query.search
@@ -110,4 +103,12 @@ export const allusers = async (req, res) => {
 
   res.send(users);
 };
+
+export const uploadFile = (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("Please upload a valid image");
+  }
+  res.send("Single file uploaded successfully");
+};
+
 

@@ -7,6 +7,7 @@ import PrelineScript from "./prelineScript";
 import { AppProvider } from '@/Context/AppProvider';
 import IncomingCall from './chat/video/call-handler/page';
 import { useState } from "react";
+import { VoiceProvider } from "@/Context/voiceRecordContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AppProvider>
+          <VoiceProvider>
           <IncomingCall 
             isOpen={isModalOpen} 
             closeModal={setIsModalOpen} 
@@ -35,6 +37,7 @@ export default function RootLayout({ children }) {
           <Toaster position="top-right" />
           {children}
           <PrelineScript />
+          </VoiceProvider>
         </AppProvider>
       </body>
     </html>

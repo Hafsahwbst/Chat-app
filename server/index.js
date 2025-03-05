@@ -29,6 +29,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("./uploads"));
+app.use(express.static("./uploads/voiceMessages"));
 app.use("/", authRoute);
 app.use("/user", userRoute);
 app.use("/", friendRoute);

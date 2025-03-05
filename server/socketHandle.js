@@ -26,125 +26,34 @@ const socketServer = async (socket, io) => {
     socket.to(roomId).emit("user-connected", socket.id);
   });
 
-  // Call requests
-  socket.on("call-user", ({ calleeId, caller, callType }) => {
-    console.log(`Call request: ${caller.id} is calling ${calleeId} (${callType})`);
-    
-    if (!calleeId || !caller || !caller.id) {
-      console.error("Invalid call request data");
-      return;
-    }
-    
-    // Include roomId in the call data
-    const callData = {
-      caller: {
-        id: caller.id,
-        username: caller.username || "User",
-        roomId: caller.roomId
-      },
-      callType: callType
-    };
-    
-    // Send to specific user
-    const calleeSocketId = users[calleeId];
-    if (calleeSocketId) {
-      console.log(`Sending incoming-call to ${calleeId} (socket: ${calleeSocketId})`);
-      io.to(calleeSocketId).emit("incoming-call", callData);
-    } else {
-      console.error(`User ${calleeId} is not connected`);
-      // Notify caller that user is not available
-      io.to(socket.id).emit("call-failed", { reason: "user-unavailable" });
-    }
+    // Call user (initiate call)
+    socket.on('call-user', ({ calleeId, caller, callType }) => {
+      console.log(`Call initiated from ${caller.id} to ${calleeId} with call type: ${callType}`);
+      io.to(calleeId).emit('incoming-call', { caller, callType });
   });
 
-  // WebRTC signaling
-  socket.on("offer", ({ signal, receiverId }) => {
-    console.log(`Offer from ${socket.id} to ${receiverId}`);
-    
-    if (!receiverId) {
-      console.error("Missing receiverId in offer");
-      return;
-    }
-    
-    const receiverSocketId = users[receiverId];
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("offer", {
-        signal,
-        from: socket.id
-      });
-    } else {
-      console.error(`Cannot send offer: Recipient ${receiverId} not found`);
-    }
+  // When the user accepts the call
+  socket.on('call-accepted', ({ callerId, accepterId, roomId }) => {
+      console.log(`Call accepted by ${accepterId}`);
+      io.to(callerId).emit('call-accepted', { roomId, accepterId });
   });
 
-  socket.on("answer", ({ signal, to }) => {
-    console.log(`Answer from ${socket.id} to ${to}`);
-    
-    if (!to) {
-      console.error("Missing 'to' in answer");
-      return;
-    }
-    
-    io.to(to).emit("answer", { signal, from: socket.id });
+  // When the user declines the call
+  socket.on('call-declined', ({ userId, roomId }) => {
+      console.log(`Call declined by ${userId}`);
+      io.to(userId).emit('call-declined', { roomId });
   });
 
-  // ICE candidates
-  socket.on("ice-candidate", ({ candidate, to }) => {
-    console.log(`ICE candidate from ${socket.id} to ${to}`);
-    
-    if (!to) {
-      console.error("Missing 'to' in ice-candidate");
-      return;
-    }
-    
-    io.to(to).emit("ice-candidate", { candidate, from: socket.id });
+  // Sending ICE candidate
+  socket.on('offer', ({ userId, signal, receiverId }) => {
+      console.log(`Sending offer to ${userId}`);
+      io.to(userId).emit('offer', { signal, receiverId });
   });
 
-  // Call acceptance/rejection
-  socket.on('call-accepted', (data) => {
-    const { callerId, accepterId, roomId } = data;
-    console.log(`Call accepted: ${accepterId} accepted call from ${callerId}`);
-    
-    if (!callerId || !accepterId) {
-      console.error("Missing data in call-accepted");
-      return;
-    }
-    
-    const callerSocketId = users[callerId];
-    if (callerSocketId) {
-      io.to(callerSocketId).emit('call-accepted', { 
-        accepterId,
-        accepterSocketId: socket.id,
-        roomId
-      });
-    } else {
-      console.error(`Caller ${callerId} is not connected`);
-    }
-  });
-
-  socket.on('call-declined', (data) => {
-    const { userId } = data;
-    console.log(`Call declined: Call to ${userId} was declined`);
-    
-    if (!userId) {
-      console.error("Missing userId in call-declined");
-      return;
-    }
-    
-    const callerSocketId = users[userId];
-    if (callerSocketId) {
-      io.to(callerSocketId).emit('call-declined');
-    } else {
-      console.error(`User ${userId} is not connected`);
-    }
-  });
-
-  // Call ended
-  socket.on('end-call', ({ roomId }) => {
-    console.log(`Call ended in room ${roomId}`);
-    if (roomId) {
-      socket.to(roomId).emit('call-ended');
-    }
+  // ICE candidate handling
+  socket.on('ice-candidate', (candidate) => {
+      console.log('Sending ICE candidate');
+      socket.to(candidate.receiverId).emit('ice-candidate', candidate);
   });
 
   // Chat messaging
@@ -173,6 +82,14 @@ const socketServer = async (socket, io) => {
       
       // Send to user's room
       socket.to(user._id).emit("message received", newMessageReceived);
+    });
+  });
+
+  socket.on('send-voice-message', (data) => {
+    // Emit the voice message to the specified room
+    socket.to(data.roomId).emit('receive-voice-message', {
+      senderId: data.senderId,
+      audioUrl: data.audioUrl,  // This is the URL of the uploaded audio file
     });
   });
 

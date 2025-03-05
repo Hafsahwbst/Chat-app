@@ -15,7 +15,7 @@ const IncomingCall = ({ isOpen, closeModal }) => {
             return;
         }
 
-        // Join user's personal room to receive calls
+        // Join the user's personal room to receive calls
         socket.emit("join-room", user._id);
         console.log("Joined personal room:", user._id);
 
@@ -33,6 +33,7 @@ const IncomingCall = ({ isOpen, closeModal }) => {
 
         socket.on("incoming-call", handleIncomingCall);
 
+        // Cleanup listener when the component is unmounted or dependencies change
         return () => {
             socket.off("incoming-call", handleIncomingCall);
         };
@@ -89,22 +90,21 @@ const IncomingCall = ({ isOpen, closeModal }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center  z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50">
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black  opacity-50"></div>
+            <div className="absolute inset-0 bg-black opacity-50"></div>
 
             {/* Modal */}
-            <div className="relative z-10 bg-white rounded-lg shadow-lg overflow-hidden w-full h-full  md:w-2/3 md:h-auto">
+            <div className="relative z-10 bg-white rounded-lg shadow-lg overflow-hidden w-full h-full md:w-2/3 md:h-auto">
                 <div className="p-4 bg-blue-600 text-white text-center">
                     <h2 className="text-2xl font-bold">Incoming {callType === 'video' ? 'Video' : 'Voice'} Call</h2>
                 </div>
 
                 <div className="p-6 flex flex-col items-center justify-between h-full">
-                    <div className="flex items-center mt-28  flex-col"> 
-                        <div className="w-32 h-32 mb-8 rounded-full bg-gray-200 flex items-center justify-center ">
-                        {/* <img  size={80} className="text-gray-500" src={callerInfo.avatar && `http://localhost:5000/${callerInfo.avatar}`} alt="" /> */}
-                        <FaUser size={52} className="text-gray-500" />
-                    </div>
+                    <div className="flex items-center mt-28 flex-col"> 
+                        <div className="w-32 h-32 mb-8 rounded-full bg-gray-200 flex items-center justify-center">
+                            <FaUser size={52} className="text-gray-500" />
+                        </div>
 
                         <p className="text-4xl capitalize font-semibold mb-1">
                             {callerInfo?.username || "Unknown User"}

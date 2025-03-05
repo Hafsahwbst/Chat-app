@@ -15,7 +15,6 @@ export const AppProvider = ({ children }) => {
   const [socketConnected, setsocketConnected] = useState(false);
 
   useEffect(() => {
-    if (user) {
     const fetchUser = async () => {
       try {
         const response = await axios.get('http://localhost:5000/user/user', {
@@ -34,10 +33,7 @@ export const AppProvider = ({ children }) => {
         setLoading(false);
       }
     };
-    fetchUser();
-
-  }
-
+  fetchUser();
   }, []);
 
   useEffect(() => {
